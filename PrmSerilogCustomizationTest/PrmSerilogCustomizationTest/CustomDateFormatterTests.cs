@@ -5,8 +5,6 @@
  */
 
 using Prm.SerilogCustomization;
-using Serilog;
-using Serilog.Events;
 using System;
 using System.Globalization;
 using Xunit;
@@ -31,25 +29,10 @@ namespace PrmSerilogCustomizationTest
             #region Assert
             var formatInfo = Assert.IsType<DateTimeFormatInfo>(format);
             Assert.Equal(DateSpecifier, formatInfo.ShortDatePattern);
+            Assert.NotEqual(DateSpecifier, CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern);
+
             Assert.Equal(TimeSpecifier, formatInfo.LongTimePattern);
-            #endregion
-        }
-
-        [Fact]
-        public void EnricherDoesSomethingRight()
-        {
-            #region Arrange
-            var enricher = new UtcTimestampEnricher();
-            #endregion
-
-            #region act
-            LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
-                .Enrich.With<UtcTimestampEnricher>()
-                .WriteTo.Debug();
-            Log.Logger = loggerConfiguration.CreateLogger();
-            #endregion
-
-            #region assert
+            Assert.NotEqual(TimeSpecifier, CultureInfo.InvariantCulture.DateTimeFormat.LongTimePattern);
             #endregion
         }
 
