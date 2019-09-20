@@ -17,8 +17,8 @@
   
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>PrmSerilogCustomization</PackageId>
-    <Version>1.0.0-prerelease</Version>
+    <PackageId>Prm.SerilogCustomization</PackageId>
+    <Version>1.0.0-beta</Version>
     <Authors>Tom Puckett</Authors>
     <Company>Milliman PRM Analytics</Company>
     <PackageTags>Serilog</PackageTags>
@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="license.txt">
+    <None Update="license.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
