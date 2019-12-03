@@ -18,7 +18,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Prm.SerilogCustomization</PackageId>
-    <Version>1.0.0-beta</Version>
+    <Version>1.0.0</Version>
     <Authors>Tom Puckett</Authors>
     <Company>Milliman PRM Analytics</Company>
     <PackageTags>Serilog</PackageTags>
