@@ -21,7 +21,6 @@ namespace Prm.EmailQueue
         private static int InstanceCount = 0;
         private static object ThreadSafetyLock = new object();
         public static SmtpConfig smtpConfig = null;
-        private static ILogger _logger { get; set; }
 
         public static void ConfigureMailSender(SmtpConfig config)
         {
@@ -31,7 +30,15 @@ namespace Prm.EmailQueue
             }
         }
 
+        /// <summary>
+        /// This constructor is deprecated and may be removed in the future
+        /// </summary>
+        /// <param name="loggerArg">Not used</param>
         public MailSender(ILogger loggerArg)
+            : this()
+        { }
+
+        public MailSender()
         {
             lock (ThreadSafetyLock)
             {
@@ -41,7 +48,6 @@ namespace Prm.EmailQueue
                 }
 
                 InstanceCount++;
-                _logger = loggerArg;
 
                 if (WorkerTask == null || (WorkerTask.Status != TaskStatus.Running && WorkerTask.Status != TaskStatus.WaitingToRun))
                 {
@@ -52,6 +58,11 @@ namespace Prm.EmailQueue
                     }
                 }
             }
+        }
+
+        public bool QueueMessage(string recipient, string subject, string message, string senderAddress, string senderName)
+        {
+            return QueueMessage(new string[] { recipient }, subject, message, senderAddress, senderName);
         }
 
         public bool QueueMessage(IEnumerable<string> recipients, string subject, string message, string senderAddress, string senderName)
