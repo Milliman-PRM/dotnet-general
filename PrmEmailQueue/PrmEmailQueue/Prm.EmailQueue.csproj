@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Prm.EmailQueue</RootNamespace>
+    <Version>1.1.0</Version>
+    <Company>Milliman Inc.</Company>
   </PropertyGroup>
 
   <ItemGroup>
