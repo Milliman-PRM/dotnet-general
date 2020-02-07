@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using MailKit.Net.Smtp;
 using Serilog;
 
 namespace Prm.EmailQueue
@@ -21,6 +20,15 @@ namespace Prm.EmailQueue
         private static int InstanceCount = 0;
         private static object ThreadSafetyLock = new object();
         public static SmtpConfig smtpConfig = null;
+        private static EmailBackEndSelector _backEndSelector
+        {
+            get
+            {
+                return string.IsNullOrEmpty(smtpConfig.SendGridApiKey)
+                    ? EmailBackEndSelector.Smtp
+                    : EmailBackEndSelector.SendGrid;
+            }
+        }
 
         public static void ConfigureMailSender(SmtpConfig config)
         {
@@ -78,7 +86,14 @@ namespace Prm.EmailQueue
                     senderName = smtpConfig.SmtpFromName;
                 }
 
-                MailItem mailItem = new MailItem( subject, message, recipients, senderAddress, senderName);
+                MailItem mailItem = new MailItem 
+                { 
+                    subject = subject, 
+                    messageBody = message, 
+                    recipients = recipients, 
+                    senderAddress = senderAddress, 
+                    senderName = senderName 
+                };
 
                 Messages.Enqueue(mailItem);
             }
@@ -133,7 +148,7 @@ namespace Prm.EmailQueue
                         SendEmail(nextMessage);
                     }
                 }
-                Thread.Sleep(20);
+                Thread.Sleep(100);
             }
         }
 
@@ -146,41 +161,24 @@ namespace Prm.EmailQueue
         {
             message.sendAttempts++;
 
-            try
+            lock (ThreadSafetyLock)
             {
-                // Send mail
-                using (var client = new SmtpClient())
+                try
                 {
-                    // Attempt to authenticate if credentials are configured
-                    // Will throw an exception if authentication fails
-                    if (!string.IsNullOrWhiteSpace(smtpConfig.SmtpUsername) && !string.IsNullOrWhiteSpace(smtpConfig.SmtpPassword))
+                    EmailBackEndBase backEnd = EmailBackEndBase.Instance(_backEndSelector);
+                    backEnd.SendEmail(message, smtpConfig);
+                }
+                catch (Exception ex)
+                {
+                    if (message.sendAttempts > smtpConfig.MaximumSendAttempts)
                     {
-                        client.Connect(smtpConfig.SmtpServer, smtpConfig.SmtpPort, MailKit.Security.SecureSocketOptions.StartTlsWhenAvailable);
-                        client.Authenticate(smtpConfig.SmtpUsername, smtpConfig.SmtpPassword);
-                    }
-                    else
-                    {
-                        client.Connect(smtpConfig.SmtpServer, smtpConfig.SmtpPort, MailKit.Security.SecureSocketOptions.None);
+                        Log.Error(ex, $"Failed to send email on attempt #{message.sendAttempts}, limit exceed, message discarded.");
+                        return false;
                     }
 
-                    client.Send(message.message);
-                    client.Disconnect(true);
+                    Log.Warning(ex, $"Failed to send email on attempt #{message.sendAttempts}");
+                    Messages.Enqueue(message);
                 }
-            }
-            catch (Exception ex)
-            {
-
-                if (message.sendAttempts > smtpConfig.MaximumSendAttempts)
-                {
-                    // what is the semantics of 2 here?
-                    Log.Error(ex, $"Failed to send email on attempt #{message.sendAttempts}, limit exceed, message discarded.");
-                    return false;
-                }
-
-                Log.Warning(ex, $"Failed to send email on attempt #{message.sendAttempts}");
-                Messages.Enqueue(message);
-
-                // allow return true; while max retry limit is not exceeded ?
             }
 
             return true;
