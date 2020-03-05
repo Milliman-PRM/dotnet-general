@@ -30,6 +30,10 @@ namespace Prm.EmailQueue
             }
         }
 
+        /// <summary>
+        /// Stores the provided configuration object to govern internal behavior of the api
+        /// </summary>
+        /// <param name="config">Iff the SendGridApiKey property has null/empty value then SMTP implementation will be chosen</param>
         public static void ConfigureMailSender(SmtpConfig config)
         {
             lock (ThreadSafetyLock)
