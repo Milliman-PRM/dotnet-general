@@ -1,8 +1,11 @@
-﻿using SendGrid;
+﻿/*
+ * CODE OWNERS: Tom PUckett
+ * OBJECTIVE: <Back end implementation using SendGrid
+ * DEVELOPER NOTES: <What future developers need to know.>
+ */
+
+using SendGrid;
 using SendGrid.Helpers.Mail;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Prm.EmailQueue

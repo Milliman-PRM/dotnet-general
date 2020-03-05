@@ -1,14 +1,12 @@
 ﻿/*
  * CODE OWNERS: Tom Puckett
- * OBJECTIVE: <What and WHY.>
+ * OBJECTIVE: Back end implementation using SMTP
  * DEVELOPER NOTES: <What future developers need to know.>
  */
 
 using MimeKit;
 using MailKit.Net.Smtp;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Prm.EmailQueue
 {
