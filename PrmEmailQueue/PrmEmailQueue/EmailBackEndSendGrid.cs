@@ -6,7 +6,10 @@
 
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using Serilog;
+using System;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Prm.EmailQueue
 {
@@ -30,7 +33,12 @@ namespace Prm.EmailQueue
             var task = Task.Run(() => client.SendEmailAsync(msg));
             while (!task.IsCompleted) System.Threading.Thread.Sleep(50);
 
-            var result = task.Result;
+            var response = task.Result;
+            if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+            {
+                string body = response.Body.ReadAsStringAsync().Result;
+                Log.Error($"Failed to send email via SendGrid.{Environment.NewLine}Response status: {response.StatusCode.ToString()}{Environment.NewLine}Response body: {body}{Environment.NewLine}Response headers: {JsonSerializer.Serialize(response.Headers)}");
+            }
 
             return true;
         }
