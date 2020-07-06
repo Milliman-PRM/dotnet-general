@@ -4,6 +4,9 @@
  * DEVELOPER NOTES: 
  */
 
+using System;
+using System.Collections.Generic;
+
 namespace Prm.EmailQueue
 {
     public class SmtpConfig
@@ -23,5 +26,11 @@ namespace Prm.EmailQueue
         public string SmtpPassword { get; set; } = string.Empty;
 
         public string SendGridApiKey { get; set; } = null;
+
+        public string EmailDisclaimer { get; set; } = null;
+
+        public string DisclaimerExemptDomainString { get; set; } = string.Empty;
+
+        public IEnumerable<string> DisclaimerExemptDomainList => DisclaimerExemptDomainString.Split(new[] { ';', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
     }
 }

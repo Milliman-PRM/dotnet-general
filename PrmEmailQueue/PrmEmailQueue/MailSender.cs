@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using Serilog;
+using System.Linq;
 
 namespace Prm.EmailQueue
 {
@@ -19,7 +20,7 @@ namespace Prm.EmailQueue
         private static Task WorkerTask = null;
         private static int InstanceCount = 0;
         private static object ThreadSafetyLock = new object();
-        public static SmtpConfig smtpConfig = null;
+        private static SmtpConfig smtpConfig = null;
         private static EmailBackEndSelector _backEndSelector
         {
             get
@@ -72,13 +73,13 @@ namespace Prm.EmailQueue
             }
         }
 
-        public bool QueueMessage(string recipient, string subject, string message, string senderAddress, string senderName)
+        public bool QueueMessage(string recipient, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
         {
-            return QueueMessage(new string[] { recipient }, subject, message, senderAddress, senderName);
-        }
+            if (string.IsNullOrWhiteSpace(disclaimer))
+            {
+                disclaimer = smtpConfig.EmailDisclaimer;
+            }
 
-        public bool QueueMessage(IEnumerable<string> recipients, string subject, string message, string senderAddress, string senderName)
-        {
             try
             {
                 if (String.IsNullOrEmpty(senderAddress))
@@ -90,14 +91,22 @@ namespace Prm.EmailQueue
                     senderName = smtpConfig.SmtpFromName;
                 }
 
-                MailItem mailItem = new MailItem 
-                { 
-                    subject = subject, 
-                    messageBody = message, 
-                    recipients = recipients, 
-                    senderAddress = senderAddress, 
-                    senderName = senderName 
+                MailItem mailItem = new MailItem
+                {
+                    subject = subject,
+                    messageBody = message,
+                    recipients = new string[] { recipient },
+                    senderAddress = senderAddress,
+                    senderName = senderName
                 };
+
+                if (!string.IsNullOrWhiteSpace(disclaimer) && 
+                    !smtpConfig.DisclaimerExemptDomainList.Any(d => recipient.EndsWith(d, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    mailItem.messageBody += Environment.NewLine +
+                                            Environment.NewLine +
+                                            disclaimer;
+                }
 
                 Messages.Enqueue(mailItem);
             }
@@ -107,6 +116,22 @@ namespace Prm.EmailQueue
             }
 
             return true;
+        }
+
+        public bool QueueMessage(IEnumerable<string> recipients, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
+        {
+            bool success = true;
+
+            foreach (string recipient in recipients)
+            {
+                success &= QueueMessage(recipient, subject, message, senderAddress, senderName, disclaimer);
+                if (!success)
+                {
+                    break;
+                }
+            }
+
+            return success;
         }
 
         ~MailSender()
