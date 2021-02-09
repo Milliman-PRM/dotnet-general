@@ -5,7 +5,6 @@
  */
 
 using System.Collections.Generic;
-using MimeKit;
 
 namespace Prm.EmailQueue
 {
@@ -13,7 +12,9 @@ namespace Prm.EmailQueue
     {
         internal string subject;
         internal string messageBody;
-        internal IEnumerable<string> recipients;
+        internal List<string> recipients;
+        internal List<string> ccRecipients;
+        internal List<string> bccRecipients;
         internal string senderAddress;
         internal string senderName;
 

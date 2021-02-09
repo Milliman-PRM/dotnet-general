@@ -5,8 +5,7 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Prm.EmailQueue
 {
@@ -31,6 +30,11 @@ namespace Prm.EmailQueue
                 default:
                     return null;
             }
+        }
+
+        internal virtual Task<bool> SendEmailAsync(MailItem item, SmtpConfig config)
+        {
+            throw new NotImplementedException("Method SendEmailAsync is not implemented");
         }
 
         internal abstract bool SendEmail(MailItem item, SmtpConfig config);

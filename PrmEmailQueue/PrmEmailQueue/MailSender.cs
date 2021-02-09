@@ -73,7 +73,7 @@ namespace Prm.EmailQueue
             }
         }
 
-        public bool QueueMessage(string recipient, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
+        public bool QueueMessage(IEnumerable<string> recipients, IEnumerable<string> cc, IEnumerable<string> bcc, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
         {
             if (string.IsNullOrWhiteSpace(disclaimer))
             {
@@ -95,13 +95,17 @@ namespace Prm.EmailQueue
                 {
                     subject = subject,
                     messageBody = message,
-                    recipients = new string[] { recipient },
+                    recipients = new List<string>(recipients),
+                    ccRecipients = new List<string>(cc),
+                    bccRecipients = new List<string>(bcc),
                     senderAddress = senderAddress,
                     senderName = senderName
                 };
 
-                if (!string.IsNullOrWhiteSpace(disclaimer) && 
-                    !smtpConfig.DisclaimerExemptDomainList.Any(d => recipient.EndsWith(d, StringComparison.InvariantCultureIgnoreCase)))
+                if (!string.IsNullOrWhiteSpace(disclaimer) &&
+                     (!smtpConfig.DisclaimerExemptDomainList.Any(d => recipients.Any(r => r.EndsWith(d, StringComparison.InvariantCultureIgnoreCase))
+                                                                   || cc.Any(c => c.EndsWith(d, StringComparison.InvariantCultureIgnoreCase))
+                                                                   || bcc.Any(b => b.EndsWith(d, StringComparison.InvariantCultureIgnoreCase)))))
                 {
                     mailItem.messageBody += Environment.NewLine +
                                             Environment.NewLine +
@@ -124,7 +128,23 @@ namespace Prm.EmailQueue
 
             foreach (string recipient in recipients)
             {
-                success &= QueueMessage(recipient, subject, message, senderAddress, senderName, disclaimer);
+                success &= QueueMessage(recipients, subject, message, senderAddress, senderName, disclaimer);
+                if (!success)
+                {
+                    break;
+                }
+            }
+
+            return success;
+        }
+
+        public bool QueueMessage(IEnumerable<string> recipients, List<string> cc, List<string> bcc, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
+        {
+            bool success = true;
+
+            foreach (string recipient in recipients)
+            {
+                success &= QueueMessage(recipients, cc, bcc, subject, message, senderAddress, senderName, disclaimer);
                 if (!success)
                 {
                     break;
