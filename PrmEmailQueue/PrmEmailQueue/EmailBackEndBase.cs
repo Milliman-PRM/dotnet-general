@@ -34,6 +34,7 @@ namespace Prm.EmailQueue
 
         internal virtual Task<bool> SendEmailAsync(MailItem item, SmtpConfig config)
         {
+            // This code runs only if an override is not implemented in the derived class
             throw new NotImplementedException("Method SendEmailAsync is not implemented");
         }
 
