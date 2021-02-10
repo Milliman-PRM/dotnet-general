@@ -141,22 +141,6 @@ namespace Prm.EmailQueue
             return QueueMessage(recipients, null, null, subject, message, senderAddress, senderName, disclaimer);
         }
 
-        public bool QueueMessage(IEnumerable<string> recipients, List<string> cc, List<string> bcc, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
-        {
-            bool success = true;
-
-            foreach (string recipient in recipients)
-            {
-                success &= QueueMessage(recipients, cc, bcc, subject, message, senderAddress, senderName, disclaimer);
-                if (!success)
-                {
-                    break;
-                }
-            }
-
-            return success;
-        }
-
         ~MailSender()
         {
             lock (ThreadSafetyLock)
