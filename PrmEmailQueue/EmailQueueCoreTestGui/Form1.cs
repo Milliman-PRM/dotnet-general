@@ -34,7 +34,7 @@ namespace EmailQueueCoreTestGui
 
             MailSender.ConfigureMailSender(config);
             MailSender mailSender = new MailSender();
-            bool success = mailSender.QueueMessage(listToAddresses.Items.Cast<string>(), textSubject.Text, textMessageText.Text, config.SmtpFromAddress, config.SmtpFromName);
+            bool success = mailSender.QueueMessage(listToAddresses.Items.Cast<string>(), lstCcAddresses.Items.Cast<string>(), lstBccAddresses.Items.Cast<string>(), textSubject.Text, textMessageText.Text, config.SmtpFromAddress, config.SmtpFromName);
 
             if (!success)
             {

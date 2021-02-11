@@ -73,8 +73,15 @@ namespace Prm.EmailQueue
             }
         }
 
-        public bool QueueMessage(string recipient, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
+        public bool QueueMessage(IEnumerable<string> recipients, IEnumerable<string> cc, IEnumerable<string> bcc, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
         {
+            // SendGrid fails to send if any email address is provided in more than one of the lists: recipients, cc, bcc
+            if (recipients.Union(cc ?? new List<string>(), StringComparer.InvariantCultureIgnoreCase).Union(bcc ?? new List<string>(), StringComparer.InvariantCultureIgnoreCase).Count() 
+                != recipients.Count() + (cc ?? new List<string>()).Count() + (bcc ?? new List<string>()).Count())
+            {
+                throw new ApplicationException("Attempt to queue email message with at least one email address duplicated in recipient, cc, and bcc lists");
+            }
+
             if (string.IsNullOrWhiteSpace(disclaimer))
             {
                 disclaimer = smtpConfig.EmailDisclaimer;
@@ -95,13 +102,24 @@ namespace Prm.EmailQueue
                 {
                     subject = subject,
                     messageBody = message,
-                    recipients = new string[] { recipient },
+                    recipients = new List<string>(recipients),
                     senderAddress = senderAddress,
                     senderName = senderName
                 };
+                if (cc != null)
+                {
+                    mailItem.ccRecipients = new List<string>(cc);
+                }
+                if (bcc != null)
+                {
+                    mailItem.bccRecipients = new List<string>(bcc);
+                }
 
-                if (!string.IsNullOrWhiteSpace(disclaimer) && 
-                    !smtpConfig.DisclaimerExemptDomainList.Any(d => recipient.EndsWith(d, StringComparison.InvariantCultureIgnoreCase)))
+                // Add the configured disclaimer if any recipient or cc or bcc is not in the DisclaimerExemptDomainList
+                if (!string.IsNullOrWhiteSpace(disclaimer) &&
+                    (mailItem.recipients.Any(r => !smtpConfig.DisclaimerExemptDomainList.Any(d => r.EndsWith(d)) ) ||
+                     mailItem.ccRecipients.Any(c => !smtpConfig.DisclaimerExemptDomainList.Any(d => c.EndsWith(d))) ||
+                     mailItem.bccRecipients.Any(b => !smtpConfig.DisclaimerExemptDomainList.Any(d => b.EndsWith(d)))))
                 {
                     mailItem.messageBody += Environment.NewLine +
                                             Environment.NewLine +
@@ -120,18 +138,7 @@ namespace Prm.EmailQueue
 
         public bool QueueMessage(IEnumerable<string> recipients, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
         {
-            bool success = true;
-
-            foreach (string recipient in recipients)
-            {
-                success &= QueueMessage(recipient, subject, message, senderAddress, senderName, disclaimer);
-                if (!success)
-                {
-                    break;
-                }
-            }
-
-            return success;
+            return QueueMessage(recipients, null, null, subject, message, senderAddress, senderName, disclaimer);
         }
 
         ~MailSender()
