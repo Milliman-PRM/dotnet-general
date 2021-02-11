@@ -68,6 +68,7 @@ Completed by: ___________
 - [ ] Merge into master branch and promote released code base
 - [ ] Tag the release in the master branch
 - [ ] Merge master into develop to make sure warm changes are propagated
+- [ ] As appropriate, remove prerelease versions of the released package from S:\PRM\packages
 
 ##### Assertions
 
