@@ -2,6 +2,10 @@
 
 ## Release Notes
 
+#### v2.1.0
+
+- Add support for cc and bcc recipients in email messages
+
 ### v2.0.0
 
 - Added support for disclaimer text appended to sent email messages
