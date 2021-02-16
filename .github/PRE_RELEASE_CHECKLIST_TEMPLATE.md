@@ -20,11 +20,11 @@ Completed by: ___________
 
 - [ ] Fill in the Release Version above and name this pull request "Pre-Release - vX.X.X" to match the release version
 - [ ] The package version is updated to an appropriate production version syntax vx.x.x with no non-production suffix
-- [ ] Publish the new package to S:\PRM\packages
+- [ ] Publish the newly built built package using the publishing profile included in the project
 - [ ] Document an appropriate testing strategy / checklist
 - [ ] Complete the testing checklist
 - [ ] Create issues for any bugs found in testing
-- [ ] Triage all discovered issues and address unacceptable defects
+- [ ] Triage all discovered issues and address high priority / risk bugs
 - [ ] Check that prioritized issues have been resolved
 - [ ] Identify reviewer(s) and communicate changes to them
 - [ ] Hand off to Peer Reviewer(s)
@@ -32,7 +32,7 @@ Completed by: ___________
 ##### Assertions
 
 - [ ] The Release Version has been updated in this pull request above
-- [ ] All tests are passing or issues are determined to be acceptable
+- [ ] All tests are passing
 - [ ] The software version and release versions match
 - [ ] The release notes are up to date and reflect the changes included in this release
 - [ ] The UAT Documentation has been prepared for the reviewer(s)
