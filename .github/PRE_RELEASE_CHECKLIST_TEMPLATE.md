@@ -20,7 +20,7 @@ Completed by: ___________
 
 - [ ] Fill in the Release Version above and name this pull request "Pre-Release - vX.X.X" to match the release version
 - [ ] The package version is updated to an appropriate production version syntax vx.x.x with no non-production suffix
-- [ ] Publish the newly built built package using the publishing profile included in the project
+- [ ] Publish the newly built package using the publishing profile included in the project
 - [ ] Document an appropriate testing strategy / checklist
 - [ ] Complete the testing checklist
 - [ ] Create issues for any bugs found in testing
