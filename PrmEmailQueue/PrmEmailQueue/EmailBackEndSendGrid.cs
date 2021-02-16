@@ -60,9 +60,9 @@ namespace Prm.EmailQueue
                 PlainTextContent = item.messageBody,
                 //HtmlContent = "some html"
             };
-            item.recipients.ForEach(r => msg.AddTo(new EmailAddress(r)));
-            item.ccRecipients.ForEach(c => msg.AddCc(c));
-            item.bccRecipients.ForEach(b => msg.AddBcc(b));
+            if (item.recipients != null) item.recipients.ForEach(r => msg.AddTo(new EmailAddress(r)));
+            if (item.ccRecipients != null) item.ccRecipients.ForEach(c => msg.AddCc(c));
+            if (item.bccRecipients != null) item.bccRecipients.ForEach(b => msg.AddBcc(b));
 
             return msg;
         }
