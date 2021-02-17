@@ -8,6 +8,7 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using Serilog;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Text.Json;
 
@@ -38,7 +39,10 @@ namespace Prm.EmailQueue
             var msg = PrepareSendGridMessageEmail(item, config);
 
             var task = Task.Run(() => client.SendEmailAsync(msg));
-            while (!task.IsCompleted) System.Threading.Thread.Sleep(50);
+            while (!task.IsCompleted)
+            {
+                Thread.Sleep(50);
+            }
 
             var response = task.Result;
             if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
