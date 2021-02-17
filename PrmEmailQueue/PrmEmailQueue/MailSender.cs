@@ -139,6 +139,11 @@ namespace Prm.EmailQueue
             return QueueMessage(recipients, null, null, subject, message, senderAddress, senderName, disclaimer);
         }
 
+        public bool QueueMessage(string recipient, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
+        {
+            return QueueMessage(new string[] { recipient }, subject, message, senderAddress, senderName, disclaimer);
+        }
+
         ~MailSender()
         {
             lock (ThreadSafetyLock)
