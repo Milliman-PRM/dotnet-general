@@ -106,14 +106,12 @@ namespace Prm.EmailQueue
                     senderAddress = senderAddress,
                     senderName = senderName
                 };
-                if (cc != null)
-                {
-                    mailItem.ccRecipients = new List<string>(cc);
-                }
-                if (bcc != null)
-                {
-                    mailItem.bccRecipients = new List<string>(bcc);
-                }
+                mailItem.ccRecipients = cc != null 
+                                      ? new List<string>(cc)
+                                      : new List<string>();
+                mailItem.bccRecipients = bcc != null 
+                                      ? new List<string>(bcc)
+                                      : new List<string>();
 
                 // Add the configured disclaimer if any recipient or cc or bcc is not in the DisclaimerExemptDomainList
                 if (!string.IsNullOrWhiteSpace(disclaimer) &&
@@ -139,6 +137,11 @@ namespace Prm.EmailQueue
         public bool QueueMessage(IEnumerable<string> recipients, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
         {
             return QueueMessage(recipients, null, null, subject, message, senderAddress, senderName, disclaimer);
+        }
+
+        public bool QueueMessage(string recipient, string subject, string message, string senderAddress, string senderName, string disclaimer = null)
+        {
+            return QueueMessage(new string[] { recipient }, subject, message, senderAddress, senderName, disclaimer);
         }
 
         ~MailSender()
