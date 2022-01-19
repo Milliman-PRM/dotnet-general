@@ -18,7 +18,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Prm.SerilogCustomization</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Tom Puckett</Authors>
     <Company>Milliman PRM Analytics</Company>
     <PackageTags>Serilog</PackageTags>
@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.8.0" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
   </ItemGroup>
 
   <ItemGroup>
